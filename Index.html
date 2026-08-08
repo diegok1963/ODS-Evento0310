@@ -88,6 +88,7 @@
       align-items: center;
       justify-content: center;
       gap: 12px;
+      flex-wrap: wrap;
     }
     .counter-bar .label { font-size: 0.9rem; color: #555; }
     .counter-bar .count {
@@ -210,6 +211,108 @@
       border-color: var(--navy);
       background: rgba(0,35,102,0.03);
     }
+    #seccionAcompanantes {
+      display: none;
+      margin-top: 8px;
+    }
+    #seccionAcompanantes.visible { display: block; }
+    .acompanantes-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+    .acompanantes-header span {
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: var(--navy);
+    }
+    .acompanantes-header .badge-count {
+      background: var(--navy);
+      color: white;
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 2px 10px;
+      border-radius: 99px;
+    }
+    .acompanante-card {
+      background: #F8FAFF;
+      border: 1px solid #DBEAFE;
+      border-radius: 10px;
+      padding: 16px;
+      margin-bottom: 12px;
+      position: relative;
+    }
+    .acompanante-card .card-num {
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: var(--navy);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .btn-eliminar {
+      background: none;
+      border: none;
+      color: var(--error);
+      cursor: pointer;
+      font-size: 0.8rem;
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: 4px;
+      transition: background 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .btn-eliminar:hover { background: #FEE2E2; }
+    .acomp-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+    .acomp-grid .full { grid-column: 1 / -1; }
+    .acomp-grid label {
+      font-size: 0.8rem;
+      margin-bottom: 5px;
+    }
+    .acomp-grid input, .acomp-grid select {
+      padding: 9px 12px;
+      font-size: 0.88rem;
+    }
+    .btn-agregar {
+      width: 100%;
+      padding: 11px;
+      background: white;
+      color: var(--navy);
+      border: 2px dashed var(--navy);
+      border-radius: 8px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      margin-top: 4px;
+    }
+    .btn-agregar:hover { background: rgba(0,35,102,0.05); }
+    .info-cupos {
+      background: #FFF7ED;
+      border: 1px solid #FED7AA;
+      border-radius: 8px;
+      padding: 10px 14px;
+      font-size: 0.82rem;
+      color: #92400E;
+      margin-top: 10px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
     .btn-submit {
       width: 100%;
       padding: 15px;
@@ -283,6 +386,8 @@
       .header-text h1 { font-size: 1.2rem; }
       .card-body { padding: 20px 16px; }
       .counter-bar { flex-wrap: wrap; gap: 8px; }
+      .acomp-grid { grid-template-columns: 1fr; }
+      .acomp-grid .full { grid-column: 1; }
     }
   </style>
 </head>
@@ -352,6 +457,22 @@
             </div>
           </div>
           <span class="field-error" id="err-familia">Por favor seleccioná una opción.</span>
+
+          <div id="seccionAcompanantes">
+            <br/>
+            <div class="acompanantes-header">
+              <span>👥 Datos de los acompañantes</span>
+              <span class="badge-count" id="badgeCount">0 acompañantes</span>
+            </div>
+            <div id="listaAcompanantes"></div>
+            <button type="button" class="btn-agregar" onclick="agregarAcompanante()">
+              ➕ Agregar acompañante
+            </button>
+            <div class="info-cupos">
+              ⚠️ Cada acompañante ocupa un cupo de los 300 disponibles.
+            </div>
+            <span class="field-error" id="err-acompanantes">Por favor completá los datos de todos los acompañantes.</span>
+          </div>
         </div>
 
         <div class="form-group">
@@ -377,7 +498,7 @@
           <span class="alert-icon">🎉</span>
           <div class="alert-body">
             <strong>¡Reserva confirmada!</strong>
-            Tu lugar en el almuerzo ha sido registrado. Te esperamos el 3 de agosto de 2026.
+            <span id="msgExito">Tu lugar en el almuerzo ha sido registrado. Te esperamos el 3 de agosto de 2026.</span>
           </div>
         </div>
         <div class="alert alert-error" id="alertError">
@@ -398,9 +519,9 @@
 </footer>
 
 <script>
-  // 👇 REEMPLAZÁ ESTA LÍNEA con tu URL de Google Apps Script
-  const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxiIBU2RuRFIgr2mWk5KrO_qwbD7H1yCEvOOsyWkAEOZ1CQM7WMgp1Ra-YUxPyAKhfy8w/exec';
+  const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxuHvwVi0bNAZpgweeXNNJgWyj6oeftmavowIDj5YbgTD3wdTLo8j0rQtHivrZKddahZQ/exec';
   const TOTAL_CUPOS = 300;
+  const RELACIONES = ['Esposo/a','Hijo/a','Padre / Madre','Hermano/a','Novio/a','Amigo/a','Otro'];
 
   const selectProm = document.getElementById('promocion');
   for (let i = 1; i <= 87; i++) {
@@ -423,6 +544,107 @@
   }
   cargarContador();
 
+  document.querySelectorAll('input[name="familia"]').forEach(r => {
+    r.addEventListener('change', function() {
+      const sec = document.getElementById('seccionAcompanantes');
+      if (this.value === 'Sí') {
+        sec.classList.add('visible');
+        if (document.getElementById('listaAcompanantes').children.length === 0) {
+          agregarAcompanante();
+        }
+      } else {
+        sec.classList.remove('visible');
+        document.getElementById('listaAcompanantes').innerHTML = '';
+        actualizarBadge();
+      }
+      showError('familia', false);
+    });
+  });
+
+  let contadorAcomp = 0;
+
+  function agregarAcompanante() {
+    contadorAcomp++;
+    const id = contadorAcomp;
+    const lista = document.getElementById('listaAcompanantes');
+    const opciones = RELACIONES.map(r => `<option value="${r}">${r}</option>`).join('');
+    const div = document.createElement('div');
+    div.className = 'acompanante-card';
+    div.id = `acomp-${id}`;
+    div.innerHTML = `
+      <div class="card-num">
+        👤 Acompañante ${lista.children.length + 1}
+        <button type="button" class="btn-eliminar" onclick="eliminarAcompanante(${id})">✕ Eliminar</button>
+      </div>
+      <div class="acomp-grid">
+        <div>
+          <label>Nombre <span class="req">*</span></label>
+          <input type="text" id="acomp-nombre-${id}" placeholder="Nombre" />
+        </div>
+        <div>
+          <label>Apellido <span class="req">*</span></label>
+          <input type="text" id="acomp-apellido-${id}" placeholder="Apellido" />
+        </div>
+        <div class="full">
+          <label>Relación <span class="req">*</span></label>
+          <div class="select-wrap">
+            <select id="acomp-relacion-${id}">
+              <option value="">— Seleccioná —</option>
+              ${opciones}
+            </select>
+          </div>
+        </div>
+      </div>`;
+    lista.appendChild(div);
+    actualizarBadge();
+    actualizarNumeracion();
+  }
+
+  function eliminarAcompanante(id) {
+    const el = document.getElementById(`acomp-${id}`);
+    if (el) el.remove();
+    actualizarBadge();
+    actualizarNumeracion();
+  }
+
+  function actualizarBadge() {
+    const cant = document.getElementById('listaAcompanantes').children.length;
+    document.getElementById('badgeCount').textContent = cant === 1 ? '1 acompañante' : `${cant} acompañantes`;
+  }
+
+  function actualizarNumeracion() {
+    document.querySelectorAll('.acompanante-card').forEach((card, i) => {
+      const id = card.id.replace('acomp-', '');
+      card.querySelector('.card-num').innerHTML = `
+        👤 Acompañante ${i + 1}
+        <button type="button" class="btn-eliminar" onclick="eliminarAcompanante(${id})">✕ Eliminar</button>`;
+    });
+  }
+
+  function obtenerAcompanantes() {
+    const cards = document.querySelectorAll('.acompanante-card');
+    const acompanantes = [];
+    let valido = true;
+    cards.forEach(card => {
+      const id = card.id.replace('acomp-', '');
+      const nombre   = document.getElementById(`acomp-nombre-${id}`).value.trim();
+      const apellido = document.getElementById(`acomp-apellido-${id}`).value.trim();
+      const relacion = document.getElementById(`acomp-relacion-${id}`).value;
+      if (!nombre || !apellido || !relacion) {
+        valido = false;
+        if (!nombre)   document.getElementById(`acomp-nombre-${id}`).classList.add('error');
+        if (!apellido) document.getElementById(`acomp-apellido-${id}`).classList.add('error');
+        if (!relacion) document.getElementById(`acomp-relacion-${id}`).classList.add('error');
+      } else {
+        document.getElementById(`acomp-nombre-${id}`).classList.remove('error');
+        document.getElementById(`acomp-apellido-${id}`).classList.remove('error');
+        document.getElementById(`acomp-relacion-${id}`).classList.remove('error');
+        acompanantes.push({ nombre, apellido, relacion });
+      }
+    });
+    return { valido, acompanantes };
+  }
+
   function showError(id, show) {
     const el = document.getElementById('err-' + id);
     const input = document.getElementById(id) || document.querySelector(`[name="${id}"]`);
@@ -441,6 +663,17 @@
     const familia = document.querySelector('input[name="familia"]:checked');
     showError('familia', !familia);
     if (!familia) valid = false;
+    if (familia && familia.value === 'Sí') {
+      const lista = document.getElementById('listaAcompanantes');
+      if (lista.children.length === 0) {
+        showError('acompanantes', true);
+        valid = false;
+      } else {
+        const { valido } = obtenerAcompanantes();
+        showError('acompanantes', !valido);
+        if (!valido) valid = false;
+      }
+    }
     const email = document.getElementById('email').value.trim();
     const emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
     showError('email', !emailOk);
@@ -456,50 +689,59 @@
     document.getElementById('alertSuccess').classList.remove('show');
     document.getElementById('alertError').classList.remove('show');
     if (!validateForm()) return;
-
     if (APPS_SCRIPT_URL === 'TU_URL_DE_APPS_SCRIPT_AQUI') {
       document.getElementById('errorTitle').textContent = 'Configuración pendiente';
-      document.getElementById('errorMsg').textContent = 'El sistema aún no está conectado a Google Sheets. Seguí la guía de configuración.';
+      document.getElementById('errorMsg').textContent = 'El sistema aún no está conectado a Google Sheets.';
       document.getElementById('alertError').classList.add('show');
       return;
     }
-
     const btn = document.getElementById('btnSubmit');
     const spinner = document.getElementById('spinner');
     const btnText = document.getElementById('btnText');
     btn.disabled = true;
     spinner.style.display = 'block';
     btnText.textContent = 'Enviando…';
-
+    const familia = document.querySelector('input[name="familia"]:checked').value;
+    let acompanantes = [];
+    if (familia === 'Sí') {
+      acompanantes = obtenerAcompanantes().acompanantes;
+    }
     const payload = {
       action: 'reservar',
       promocion: document.getElementById('promocion').value,
       nombre: document.getElementById('nombre').value.trim(),
-      familia: document.querySelector('input[name="familia"]:checked').value,
+      familia: familia,
+      acompanantes: acompanantes,
       email: document.getElementById('email').value.trim(),
       celular: document.getElementById('celular').value.trim(),
     };
-
     try {
       const res = await fetch(APPS_SCRIPT_URL, { method: 'POST', body: JSON.stringify(payload) });
       const data = await res.json();
       if (data.status === 'ok') {
+        const totalPersonas = 1 + acompanantes.length;
+        document.getElementById('msgExito').textContent = totalPersonas > 1
+          ? `Tu reserva para ${totalPersonas} personas ha sido registrada. ¡Te esperamos el 3 de agosto de 2026!`
+          : 'Tu lugar en el almuerzo ha sido registrado. ¡Te esperamos el 3 de agosto de 2026!';
         document.getElementById('alertSuccess').classList.add('show');
         document.getElementById('reservaForm').reset();
+        document.getElementById('listaAcompanantes').innerHTML = '';
+        document.getElementById('seccionAcompanantes').classList.remove('visible');
+        actualizarBadge();
         cargarContador();
         document.getElementById('alertSuccess').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
       } else if (data.status === 'duplicado') {
         document.getElementById('errorTitle').textContent = 'Reserva duplicada';
-        document.getElementById('errorMsg').textContent = 'Ya existe una reserva registrada con este correo electrónico.';
+        document.getElementById('errorMsg').textContent = 'Ya existe una reserva con este correo electrónico.';
         document.getElementById('alertError').classList.add('show');
       } else if (data.status === 'sin_cupos') {
         document.getElementById('errorTitle').textContent = 'Sin cupos disponibles';
-        document.getElementById('errorMsg').textContent = 'Lo sentimos, ya no hay cupos disponibles para el evento.';
+        document.getElementById('errorMsg').textContent = 'Lo sentimos, ya no hay cupos disponibles.';
         document.getElementById('alertError').classList.add('show');
       } else { throw new Error(); }
     } catch (err) {
       document.getElementById('errorTitle').textContent = 'Error de conexión';
-      document.getElementById('errorMsg').textContent = 'No se pudo conectar con el servidor. Verificá tu conexión e intentá nuevamente.';
+      document.getElementById('errorMsg').textContent = 'No se pudo conectar. Verificá tu conexión e intentá nuevamente.';
       document.getElementById('alertError').classList.add('show');
     } finally {
       btn.disabled = false;
@@ -511,9 +753,6 @@
   ['promocion','nombre','email','celular'].forEach(id => {
     const el = document.getElementById(id);
     if (el) el.addEventListener('input', () => showError(id, false));
-  });
-  document.querySelectorAll('input[name="familia"]').forEach(r => {
-    r.addEventListener('change', () => showError('familia', false));
   });
 </script>
 </body>
