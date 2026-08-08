@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Reservas – Almuerzo ODS 03/08/2026</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --navy:   rgb(0, 35, 102);
+      --gold:   #C9A84C;
+      --gold-l: #F0D080;
+      --white:  #FFFFFF;
+      --bg:     #F4F6FB;
+      --text:   #1a1a2e;
+      --border: #CBD5E1;
+      --success:#16A34A;
+      --error:  #DC2626;
+      --radius: 12px;
+    }
+    body {
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+    header {
+      background: var(--navy);
+      padding: 24px 32px;
+      display: flex;
+      align-items: center;
+      gap: 24px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+    }
+    header img {
+      height: 90px; width: 90px;
+      object-fit: contain;
+      border-radius: 50%;
+      border: 3px solid var(--gold);
+      background: white;
+      padding: 4px;
+      flex-shrink: 0;
+    }
+    .header-text h1 {
+      color: var(--white);
+      font-size: 1.75rem;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      line-height: 1.2;
+    }
+    .header-text h1 span { color: var(--gold-l); }
+    .header-text p {
+      color: rgba(255,255,255,0.75);
+      font-size: 0.95rem;
+      margin-top: 4px;
+    }
+    .event-banner {
+      background: linear-gradient(135deg, var(--navy) 0%, #003580 100%);
+      color: white;
+      text-align: center;
+      padding: 20px 16px;
+      border-bottom: 4px solid var(--gold);
+    }
+    .event-banner .badges {
+      display: flex;
+      justify-content: center;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin-top: 8px;
+    }
+    .badge {
+      background: rgba(255,255,255,0.12);
+      border: 1px solid rgba(201,168,76,0.5);
+      color: var(--gold-l);
+      padding: 6px 16px;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .counter-bar {
+      background: white;
+      border-bottom: 1px solid var(--border);
+      padding: 14px 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+    }
+    .counter-bar .label { font-size: 0.9rem; color: #555; }
+    .counter-bar .count {
+      font-size: 1.4rem;
+      font-weight: 800;
+      color: var(--navy);
+    }
+    .progress-wrap {
+      flex: 1;
+      max-width: 300px;
+      background: #e2e8f0;
+      border-radius: 99px;
+      height: 10px;
+      overflow: hidden;
+    }
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--navy), var(--gold));
+      border-radius: 99px;
+      transition: width 0.6s ease;
+    }
+    main {
+      max-width: 680px;
+      margin: 40px auto;
+      padding: 0 16px 60px;
+    }
+    .card {
+      background: white;
+      border-radius: var(--radius);
+      box-shadow: 0 4px 24px rgba(0,35,102,0.10);
+      overflow: hidden;
+    }
+    .card-header {
+      background: var(--navy);
+      padding: 20px 28px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .card-header .icon { font-size: 1.5rem; }
+    .card-header h2 {
+      color: white;
+      font-size: 1.15rem;
+      font-weight: 600;
+    }
+    .card-body { padding: 28px; }
+    .form-group { margin-bottom: 22px; }
+    label {
+      display: block;
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: var(--navy);
+      margin-bottom: 7px;
+    }
+    label .req { color: var(--error); margin-left: 2px; }
+    input[type="text"],
+    input[type="email"],
+    input[type="tel"],
+    select {
+      width: 100%;
+      padding: 12px 16px;
+      border: 2px solid var(--border);
+      border-radius: 8px;
+      font-size: 0.95rem;
+      color: var(--text);
+      background: white;
+      transition: border-color 0.2s, box-shadow 0.2s;
+      appearance: none;
+      -webkit-appearance: none;
+    }
+    input:focus, select:focus {
+      outline: none;
+      border-color: var(--navy);
+      box-shadow: 0 0 0 3px rgba(0,35,102,0.12);
+    }
+    input.error, select.error { border-color: var(--error); }
+    .field-error {
+      color: var(--error);
+      font-size: 0.78rem;
+      margin-top: 4px;
+      display: none;
+    }
+    .field-error.show { display: block; }
+    .select-wrap { position: relative; }
+    .select-wrap::after {
+      content: '▾';
+      position: absolute;
+      right: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--navy);
+      pointer-events: none;
+      font-size: 1rem;
+    }
+    .radio-group { display: flex; gap: 12px; flex-wrap: wrap; }
+    .radio-option { flex: 1; min-width: 140px; }
+    .radio-option input[type="radio"] { display: none; }
+    .radio-option label {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 12px 16px;
+      border: 2px solid var(--border);
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      font-weight: 500;
+      color: #555;
+      transition: all 0.2s;
+      text-align: center;
+    }
+    .radio-option input[type="radio"]:checked + label {
+      border-color: var(--navy);
+      background: rgba(0,35,102,0.06);
+      color: var(--navy);
+      font-weight: 700;
+    }
+    .radio-option label:hover {
+      border-color: var(--navy);
+      background: rgba(0,35,102,0.03);
+    }
+    .btn-submit {
+      width: 100%;
+      padding: 15px;
+      background: var(--navy);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      letter-spacing: 0.5px;
+      transition: background 0.2s, transform 0.1s, box-shadow 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      margin-top: 8px;
+    }
+    .btn-submit:hover {
+      background: #003580;
+      box-shadow: 0 4px 16px rgba(0,35,102,0.3);
+    }
+    .btn-submit:active { transform: scale(0.98); }
+    .btn-submit:disabled {
+      background: #94a3b8;
+      cursor: not-allowed;
+      transform: none;
+    }
+    .spinner {
+      width: 18px; height: 18px;
+      border: 3px solid rgba(255,255,255,0.3);
+      border-top-color: white;
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      display: none;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .alert {
+      border-radius: 8px;
+      padding: 16px 20px;
+      margin-top: 20px;
+      font-size: 0.92rem;
+      display: none;
+      align-items: flex-start;
+      gap: 12px;
+    }
+    .alert.show { display: flex; }
+    .alert-success {
+      background: #F0FDF4;
+      border: 1px solid #86EFAC;
+      color: #166534;
+    }
+    .alert-error {
+      background: #FEF2F2;
+      border: 1px solid #FCA5A5;
+      color: #991B1B;
+    }
+    .alert-icon { font-size: 1.3rem; flex-shrink: 0; }
+    .alert-body strong { display: block; margin-bottom: 2px; }
+    footer {
+      text-align: center;
+      padding: 24px;
+      color: #94a3b8;
+      font-size: 0.8rem;
+      border-top: 1px solid var(--border);
+      margin-top: 40px;
+    }
+    @media (max-width: 480px) {
+      header { padding: 16px; gap: 14px; }
+      header img { height: 64px; width: 64px; }
+      .header-text h1 { font-size: 1.2rem; }
+      .card-body { padding: 20px 16px; }
+      .counter-bar { flex-wrap: wrap; gap: 8px; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <img src="logo-ods.jpg" alt="Logo Orden del Sol" />
+  <div class="header-text">
+    <h1>Orden del Sol <span>– ODS</span></h1>
+    <p>Sistema de Reservas · Almuerzo de Camaradería 2026</p>
+  </div>
+</header>
+
+<div class="event-banner">
+  <div class="badges">
+    <span class="badge">📅 Domingo 3 de Agosto, 2026</span>
+    <span class="badge">🍽️ Almuerzo de Camaradería</span>
+    <span class="badge">🎟️ 300 cupos disponibles</span>
+  </div>
+</div>
+
+<div class="counter-bar">
+  <span class="label">Reservas confirmadas:</span>
+  <span class="count" id="reservasCount">–</span>
+  <div class="progress-wrap">
+    <div class="progress-fill" id="progressFill" style="width:0%"></div>
+  </div>
+  <span class="label"><span id="cuposRestantes">–</span> cupos restantes</span>
+</div>
+
+<main>
+  <div class="card">
+    <div class="card-header">
+      <span class="icon">📋</span>
+      <h2>Formulario de Reserva</h2>
+    </div>
+    <div class="card-body">
+      <form id="reservaForm" novalidate>
+
+        <div class="form-group">
+          <label for="promocion">Número de Promoción <span class="req">*</span></label>
+          <div class="select-wrap">
+            <select id="promocion" name="promocion" required>
+              <option value="">— Seleccioná tu promoción —</option>
+            </select>
+          </div>
+          <span class="field-error" id="err-promocion">Por favor seleccioná tu promoción.</span>
+        </div>
+
+        <div class="form-group">
+          <label for="nombre">Nombre y Apellido <span class="req">*</span></label>
+          <input type="text" id="nombre" name="nombre"
+                 placeholder="Ej: Juan García" required autocomplete="name" />
+          <span class="field-error" id="err-nombre">Por favor ingresá tu nombre y apellido.</span>
+        </div>
+
+        <div class="form-group">
+          <label>¿Venís con Familia o Amigos (No Liciestas)? <span class="req">*</span></label>
+          <div class="radio-group">
+            <div class="radio-option">
+              <input type="radio" id="familia-si" name="familia" value="Sí" required />
+              <label for="familia-si">👨‍👩‍👧 Sí, vengo acompañado/a</label>
+            </div>
+            <div class="radio-option">
+              <input type="radio" id="familia-no" name="familia" value="No" />
+              <label for="familia-no">🙋 No, vengo solo/a</label>
+            </div>
+          </div>
+          <span class="field-error" id="err-familia">Por favor seleccioná una opción.</span>
+        </div>
+
+        <div class="form-group">
+          <label for="email">Correo Electrónico <span class="req">*</span></label>
+          <input type="email" id="email" name="email"
+                 placeholder="ejemplo@correo.com" required autocomplete="email" />
+          <span class="field-error" id="err-email">Por favor ingresá un correo electrónico válido.</span>
+        </div>
+
+        <div class="form-group">
+          <label for="celular">Número de Celular <span class="req">*</span></label>
+          <input type="tel" id="celular" name="celular"
+                 placeholder="Ej: +54 9 11 1234-5678" required autocomplete="tel" />
+          <span class="field-error" id="err-celular">Por favor ingresá tu número de celular.</span>
+        </div>
+
+        <button type="submit" class="btn-submit" id="btnSubmit">
+          <span class="spinner" id="spinner"></span>
+          <span id="btnText">✅ Confirmar Reserva</span>
+        </button>
+
+        <div class="alert alert-success" id="alertSuccess">
+          <span class="alert-icon">🎉</span>
+          <div class="alert-body">
+            <strong>¡Reserva confirmada!</strong>
+            Tu lugar en el almuerzo ha sido registrado. Te esperamos el 3 de agosto de 2026.
+          </div>
+        </div>
+        <div class="alert alert-error" id="alertError">
+          <span class="alert-icon">⚠️</span>
+          <div class="alert-body">
+            <strong id="errorTitle">Error al enviar</strong>
+            <span id="errorMsg">Hubo un problema al registrar tu reserva. Por favor intentá nuevamente.</span>
+          </div>
+        </div>
+
+      </form>
+    </div>
+  </div>
+</main>
+
+<footer>
+  © 2026 Orden del Sol · Compromiso, Servicio y Lealtad
+</footer>
+
+<script>
+  // 👇 REEMPLAZÁ ESTA LÍNEA con tu URL de Google Apps Script
+  const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxiIBU2RuRFIgr2mWk5KrO_qwbD7H1yCEvOOsyWkAEOZ1CQM7WMgp1Ra-YUxPyAKhfy8w/exec';
+  const TOTAL_CUPOS = 300;
+
+  const selectProm = document.getElementById('promocion');
+  for (let i = 1; i <= 87; i++) {
+    const opt = document.createElement('option');
+    opt.value = i;
+    opt.textContent = `Promoción ${i}`;
+    selectProm.appendChild(opt);
+  }
+
+  async function cargarContador() {
+    if (APPS_SCRIPT_URL === 'TU_URL_DE_APPS_SCRIPT_AQUI') return;
+    try {
+      const res = await fetch(`${APPS_SCRIPT_URL}?action=count`);
+      const data = await res.json();
+      const total = data.count || 0;
+      document.getElementById('reservasCount').textContent = total;
+      document.getElementById('cuposRestantes').textContent = Math.max(0, TOTAL_CUPOS - total);
+      document.getElementById('progressFill').style.width = Math.min(100,(total/TOTAL_CUPOS)*100) + '%';
+    } catch(e) {}
+  }
+  cargarContador();
+
+  function showError(id, show) {
+    const el = document.getElementById('err-' + id);
+    const input = document.getElementById(id) || document.querySelector(`[name="${id}"]`);
+    if (el) el.classList.toggle('show', show);
+    if (input) input.classList.toggle('error', show);
+  }
+
+  function validateForm() {
+    let valid = true;
+    const promocion = document.getElementById('promocion').value;
+    showError('promocion', !promocion);
+    if (!promocion) valid = false;
+    const nombre = document.getElementById('nombre').value.trim();
+    showError('nombre', nombre.length < 3);
+    if (nombre.length < 3) valid = false;
+    const familia = document.querySelector('input[name="familia"]:checked');
+    showError('familia', !familia);
+    if (!familia) valid = false;
+    const email = document.getElementById('email').value.trim();
+    const emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    showError('email', !emailOk);
+    if (!emailOk) valid = false;
+    const celular = document.getElementById('celular').value.trim();
+    showError('celular', celular.length < 7);
+    if (celular.length < 7) valid = false;
+    return valid;
+  }
+
+  document.getElementById('reservaForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    document.getElementById('alertSuccess').classList.remove('show');
+    document.getElementById('alertError').classList.remove('show');
+    if (!validateForm()) return;
+
+    if (APPS_SCRIPT_URL === 'TU_URL_DE_APPS_SCRIPT_AQUI') {
+      document.getElementById('errorTitle').textContent = 'Configuración pendiente';
+      document.getElementById('errorMsg').textContent = 'El sistema aún no está conectado a Google Sheets. Seguí la guía de configuración.';
+      document.getElementById('alertError').classList.add('show');
+      return;
+    }
+
+    const btn = document.getElementById('btnSubmit');
+    const spinner = document.getElementById('spinner');
+    const btnText = document.getElementById('btnText');
+    btn.disabled = true;
+    spinner.style.display = 'block';
+    btnText.textContent = 'Enviando…';
+
+    const payload = {
+      action: 'reservar',
+      promocion: document.getElementById('promocion').value,
+      nombre: document.getElementById('nombre').value.trim(),
+      familia: document.querySelector('input[name="familia"]:checked').value,
+      email: document.getElementById('email').value.trim(),
+      celular: document.getElementById('celular').value.trim(),
+    };
+
+    try {
+      const res = await fetch(APPS_SCRIPT_URL, { method: 'POST', body: JSON.stringify(payload) });
+      const data = await res.json();
+      if (data.status === 'ok') {
+        document.getElementById('alertSuccess').classList.add('show');
+        document.getElementById('reservaForm').reset();
+        cargarContador();
+        document.getElementById('alertSuccess').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      } else if (data.status === 'duplicado') {
+        document.getElementById('errorTitle').textContent = 'Reserva duplicada';
+        document.getElementById('errorMsg').textContent = 'Ya existe una reserva registrada con este correo electrónico.';
+        document.getElementById('alertError').classList.add('show');
+      } else if (data.status === 'sin_cupos') {
+        document.getElementById('errorTitle').textContent = 'Sin cupos disponibles';
+        document.getElementById('errorMsg').textContent = 'Lo sentimos, ya no hay cupos disponibles para el evento.';
+        document.getElementById('alertError').classList.add('show');
+      } else { throw new Error(); }
+    } catch (err) {
+      document.getElementById('errorTitle').textContent = 'Error de conexión';
+      document.getElementById('errorMsg').textContent = 'No se pudo conectar con el servidor. Verificá tu conexión e intentá nuevamente.';
+      document.getElementById('alertError').classList.add('show');
+    } finally {
+      btn.disabled = false;
+      spinner.style.display = 'none';
+      btnText.textContent = '✅ Confirmar Reserva';
+    }
+  });
+
+  ['promocion','nombre','email','celular'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.addEventListener('input', () => showError(id, false));
+  });
+  document.querySelectorAll('input[name="familia"]').forEach(r => {
+    r.addEventListener('change', () => showError('familia', false));
+  });
+</script>
+</body>
+</html>
