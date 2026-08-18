@@ -198,6 +198,7 @@ header { background: rgb(0,35,102); border-bottom: 2px solid var(--accent); padd
 </div>
 <select id="filtro-representante" onchange="renderTable()" style="background:#fff;border:1px solid #d1d5db;border-radius:10px;padding:9px 12px;color:#111;font-size:.85rem;outline:none;min-width:180px"><option value="">&#128100; Todos los representantes</option></select>
 <button class="btn btn-import" id="btn-import">📥 Importar Excel</button>
+<button class="btn" onclick="cargarDesdeGoogleSheets(function(n){ if(n===0) toast('No hay reservas nuevas en Sheets', 'info'); actualizarFiltroRepresentantes(); })" style="background:rgba(34,197,94,.15);border:1px solid rgba(34,197,94,.5);color:#000;font-weight:600">🔄 Sync Sheets</button>
 <input accept=".xlsx,.xls" id="imp" style="display:none" type="file"/>
 <button class="btn btn-excel" onclick="exportExcel()">📊 Exportar Excel</button>
 <button class="btn btn-pdf" onclick="exportPDF()">📄 Exportar PDF</button>
